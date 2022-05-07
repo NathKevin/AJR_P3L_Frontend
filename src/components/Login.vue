@@ -48,27 +48,31 @@
                             <br>
                             <br>
                             <v-container>
-                                <v-text-field
-                                    dense
-                                    outlined
-                                    rounded
-                                    v-model="email"
-                                    label="Email"
-                                    :rules="rules.null"
-                                >
-                                </v-text-field>
-                                <v-text-field
-                                    dense
-                                    outlined
-                                    rounded
-                                    v-model="pass"
-                                    label="Password"
-                                    :rules="rules.null"
-                                >
-                                </v-text-field>
+                                <v-form ref="form">
+
+                                    <v-text-field
+                                        dense
+                                        outlined
+                                        rounded
+                                        v-model="email"
+                                        label="Email"
+                                        :rules="rules.null"
+                                    >
+                                    </v-text-field>
+                                    <v-text-field
+                                        dense
+                                        outlined
+                                        rounded
+                                        type="password"
+                                        v-model="pass"
+                                        label="Password"
+                                        :rules="rules.null"
+                                    >
+                                    </v-text-field>
+                                </v-form>
                                 <br><br>
                                 <v-btn plain class="btnLogin blue darken-4" >
-                                    <span class="btnLogin2 white--text">LOGIN</span>
+                                    <span @click="submit" class="btnLogin2 white--text">LOGIN</span>
                                 </v-btn>
                                 <br><br>
                                 <v-card-sub-title >
@@ -100,6 +104,16 @@
             </v-row>
         </v-container>
 
+        <v-snackbar v-model="snackbar" :color="color" timeout="3000" bottom >
+            <div v-for="(errorInArray, i) in error_message" :key="i">
+                <div v-for="(errorOutArray, i) in errorInArray" :key="i">
+                    {{ errorOutArray }}
+                </div>
+            </div>
+        </v-snackbar>
+
+        <v-snackbar v-model="snackbar2" :color="color" timeout="3000" bottom >{{ success_message }}</v-snackbar>
+
     </v-main>
 </template>
 
@@ -110,6 +124,12 @@ export default {
     name: "login",
     data() {
         return{
+            error_message: null,
+            success_message: null,
+            color: null,
+            snackbar: null,
+            snackbar2: null,
+            load: null,
             email: null,
             pass: null,
             AJRlogo: image,
@@ -129,6 +149,63 @@ export default {
             this.$router.push({
                 name: 'AJR',
             });
+        },
+        submit() {
+            if(this.$refs.form.validate()) {
+                //cek validasi data yang terkirim
+                this.load = true;
+                this.$http.post(this.$api + '/login', {
+                    email: this.email,
+                    password: this.pass
+                }).then(response => {
+                    //simpan data id user yang diinput
+                    if(response.data.role == 'customer'){
+                        localStorage.setItem('id',response.data.user.idCustomer);
+                        localStorage.setItem('name',response.data.user.namaCustomer);
+                        localStorage.setItem('role',response.data.role);
+                        localStorage.setItem('token',response.data.token);
+                    }else if(response.data.role == 'pegawai'){
+                        localStorage.setItem('id',response.data.user.idPegawai);
+                        localStorage.setItem('name',response.data.user.namaPegawai);
+                        localStorage.setItem('role',response.data.role);
+                        localStorage.setItem('idRole',response.data.user.idRole);
+                        localStorage.setItem('token',response.data.token);
+                    }else if(response.data.role == 'driver'){
+                        this.success_message = 'Akun Driver tidak memiliki akses website, Login melalui aplikasi Mobile';
+                        this.color = "yellow darken-3";
+                        this.snackbar2 = true;
+                        this.load = false;
+                        return;
+                    }
+                    this.success_message = response.data.message;
+                    this.color = "green";
+                    this.snackbar2 = true;
+                    this.load = false;
+                    this.clear();
+                    // this.$store.commit("setAuthentication", true);
+                    if(response.data.role === 'customer'){
+                        this.$router.push({ name: "Customer",})
+                    }
+                    else if(response.data.role === 'pegawai'){
+                        if(response.data.user.idRole === 1){
+                            this.$router.push({ name: "Manager",})
+                        }else if(response.data.user.idRole === 2){
+                            this.$router.push({ name: "Admin",})
+                        }else{
+                            this.$router.push({ name: "CS",})
+                        }
+                    }
+                }).catch(error => {
+                    this.error_message = error.response.data.message;
+                    this.color = "red";
+                    this.snackbar = true;
+                    localStorage.removeItem('token');
+                    this.load = false;
+                })
+            }
+        },
+        clear() {
+            this.$refs.form.reset() //clear form login
         }
     }
 }

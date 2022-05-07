@@ -67,7 +67,7 @@
             <v-divider vertical></v-divider>
             <v-tooltip bottom>
                 <template v-slot:activator="{ on, attrs }">
-                    <v-btn fab class="ml-4" text color="white" router v-bind="attrs" v-on="on"> <v-icon>mdi-power</v-icon> </v-btn>
+                    <v-btn @click="logout" fab class="ml-4" text color="white" router v-bind="attrs" v-on="on"> <v-icon>mdi-power</v-icon> </v-btn>
                 </template>
                 <span>Logout</span>
             </v-tooltip>
@@ -101,13 +101,15 @@ export default {
     },
 
     methods: {
-        // logout(){
-        //     localStorage.removeItem("token");
-        //     localStorage.removeItem("id");
-        //     this.$router.push({
-        //         name: 'Login',
-        //     });
-        // }
+        logout(){
+            localStorage.removeItem("token");
+            localStorage.removeItem("id");
+            localStorage.removeItem("role");
+            localStorage.removeItem("name");
+            this.$router.push({
+                name: 'Login',
+            });
+        }
     }
 };
 </script>

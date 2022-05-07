@@ -109,6 +109,26 @@ const routes = [
     
   },
   {
+    path: '/Customer',
+    name: 'Customer',
+    component: importComponent("Customer/Beranda"),
+    children: [
+      {
+        path: "/transaksi",
+        name: "Transaksi",
+        meta: {title: 'Transaksi'},
+        component: importComponent("Customer/Transaksi"), 
+      },
+      {
+        path: "/profil",
+        name: "Profil",
+        meta: {title: 'Profil'},
+        component: importComponent("Customer/Profil"), 
+      },
+    ]
+    
+  },
+  {
     path: '/AtmaJayaRental',
     name: 'AJR',
     meta: {title: 'AJR'},
@@ -132,5 +152,36 @@ const router = new VueRouter({
   mode: 'history',
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title;
+  if(to.name !== 'AJR' && localStorage.getItem("token")===null && (to.name !== 'Login' && to.name !== 'Register')){
+      next({ name: 'AJR'});
+  }else next();
+});
+
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title;
+  if(to.name !== 'Manager' && localStorage.getItem("token")!==null && localStorage.getItem("role")==='pegawai' && localStorage.getItem("idRole")==1 
+  && (to.name !== 'Promo' && to.name !== 'Atur_Jadwal' && to.name !== 'JadwalKaryawan' && to.name !== 'TampilDataPegawai' && to.name !== 'TampilDataDriver')
+  && to.name !== 'TampilDataMitra' && to.name !== 'TampilDataMobil'){
+      next({ name: 'Manager'});
+  }else next();
+});
+
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title;
+  if(to.name !== 'Admin' && localStorage.getItem("token")!==null && localStorage.getItem("role")==='pegawai' && localStorage.getItem("idRole")==2 
+  && (to.name !== 'Mobil' && to.name !== 'Mitra' && to.name !== 'Pegawai' && to.name !== 'Driver' && to.name !== 'TampilJadwalPegawai1')){
+      next({ name: 'Admin'});
+  }else next();
+});
+
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title;
+  if(to.name !== 'CS' && localStorage.getItem("token")!==null && localStorage.getItem("role")==='pegawai' && localStorage.getItem("idRole")==3){
+      next({ name: 'CS'});
+  }else next();
+});
 
 export default router
