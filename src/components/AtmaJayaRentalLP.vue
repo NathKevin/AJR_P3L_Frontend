@@ -509,6 +509,11 @@ export default {
         }
     },
     methods : {
+        toHome(){
+            this.$router.push({
+                name: 'AJR',
+            });
+        },
         scrollMeTo(ref){
             const el = document.querySelector(ref)
             el && el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" })

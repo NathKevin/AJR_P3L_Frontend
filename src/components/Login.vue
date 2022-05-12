@@ -162,6 +162,11 @@ export default {
                     if(response.data.role == 'customer'){
                         localStorage.setItem('id',response.data.user.idCustomer);
                         localStorage.setItem('name',response.data.user.namaCustomer);
+                        localStorage.setItem('tanggalLahir',response.data.user.tanggalLahirCustomer);
+                        localStorage.setItem('KP',response.data.user.KP);
+                        localStorage.setItem('SIM',response.data.user.SIM);
+                        localStorage.setItem('statusBerkas',response.data.user.statusBerkas);
+                        localStorage.setItem('waiting',response.data.user.waiting);
                         localStorage.setItem('role',response.data.role);
                         localStorage.setItem('token',response.data.token);
                     }else if(response.data.role == 'pegawai'){
@@ -184,7 +189,11 @@ export default {
                     this.clear();
                     // this.$store.commit("setAuthentication", true);
                     if(response.data.role === 'customer'){
-                        this.$router.push({ name: "Customer",})
+                        if(localStorage.getItem('statusBerkas') === 'Diterima'){
+                            this.$router.push({ name: "Beranda",})
+                        }else{
+                            this.$router.push({ name: "Profil",})
+                            }
                     }
                     else if(response.data.role === 'pegawai'){
                         if(response.data.user.idRole === 1){

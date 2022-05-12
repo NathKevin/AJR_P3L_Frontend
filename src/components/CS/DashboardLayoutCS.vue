@@ -66,6 +66,7 @@ export default {
         return{
             drawer: true, //ini tambahan GD11
             items: [
+                {icon: "mdi-account-box-multiple", title: "Customer Checks", to: "/customerChecks"},
                 {icon: "mdi-calendar-range", title: "Jadwal Kerja Pegawai", to: "/readJadwalinCS"},
             ],
         };
